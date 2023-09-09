@@ -9,7 +9,7 @@
 * O - Open Songs Directory
 
 -----------------------------------------------------------------------------------------------------------------------
-# Instructions --
+# Instructions
 
 * Play with Console
 * Playing without makes it really loud for some reason
