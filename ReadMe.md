@@ -1,15 +1,15 @@
-CONTROLS
+# CONTROLS
 
-N - Next Song
-B - Previous Song (Back)
-V - Unpause
-C - Pause
-UP - Volume UP
-DOWN - Volume Down
-O - Open Songs Directory
+* N - Next Song
+* B - Previous Song (Back)
+* V - Unpause
+* C - Pause
+* UP - Volume UP
+* DOWN - Volume Down
+* O - Open Songs Directory
 
 -----------------------------------------------------------------------------------------------------------------------
-Instructions --
+# Instructions --
 
 Play with Console
 Playing without makes it really loud for some reason
@@ -20,6 +20,7 @@ Avoid Really long file names
 
 -----------------------------------------------------------------------------------------------------------------------
 
-Info
+# Info
 
 Songs are played alphabetically (Aa -> Zz)
+Minimum System Requirement - 500MB Ram
