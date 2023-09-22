@@ -1,18 +1,59 @@
+# import resource
 import pygame, pygame.mixer
 import os #Import to load all songs in Songs folder
+import sys
+
 
 pygame.init()
 pygame.mixer.init()
 
+def error5():
+    pygame.display.set_caption("JukeBox!")
+    AppIcon = pygame.image.load("AppIcon.ico")
+    pygame.display.set_icon(AppIcon)
+
+    SCREEN = pygame.display.set_mode((300,300))
+    SCREEN_RECT = SCREEN.get_rect()
+
+    running = True
+
+    text = pygame.font.SysFont("Arial",16,True)
+    errorMessage = text.render("Try adding a Song to the Songs Folder",True,('#ffffff'))
+
+    open_icon = pygame.image.load('Folder.png')
+    open_icon = pygame.transform.scale(open_icon,(64,64))
+
+    while running:
+        SCREEN.fill(('#000000'))
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                running = False
+                sys.exit()
+            if e.type == pygame.MOUSEBUTTONDOWN:
+                mx,my = pygame.mouse.get_pos()
+            
+                if mx >= 118 and mx <= 118+64: #Folder
+                    if my >= 200 and my <= 200+64:
+                        os.startfile('Songs')
+                
+
+        pygame.draw.rect(SCREEN,(40,40,40),(118,200,64,64)) #Folder
+        SCREEN.blit(open_icon,(118,200))
+        SCREEN.blit(errorMessage,(SCREEN_RECT.left+30,SCREEN_RECT.centery))
+        pygame.display.flip()
+
 def Jukebox() -> None:
-
-
+    global button_color
     pygame.display.set_caption("JukeBox!")
     AppIcon = pygame.image.load("AppIcon.ico")
     pygame.display.set_icon(AppIcon)
 
     folder_path = 'Songs'
     song_path_list = [] # Where the song paths are stored when app is launched
+
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
 
     for songname in os.listdir(folder_path): #Load all songs into above list
         song_path = os.path.join(folder_path,songname)
@@ -35,13 +76,16 @@ def Jukebox() -> None:
 
     song_path_list = Bubble(song_path_list)
 
+    Clock = pygame.time.Clock()
+
     pos = 0 #Position in Queue
 
     try:
         pygame.mixer.Channel(0).play(pygame.mixer.Sound(song_path_list[pos])) #Play the First song in the queue when app is launched
-        pygame.mixer.Channel(0).set_volume(0.1) #Set volume to 0.1
+        pygame.mixer.Channel(0).set_volume(0.3) #Set volume to 0.1
     except IndexError:
-        exit("Try adding a song to the Songs folder")
+        error5()
+        sys.exit()
 
     SCREEN = pygame.display.set_mode((1280,720)) #Enable Screen
 
@@ -81,10 +125,16 @@ def Jukebox() -> None:
     reload_icon = pygame.image.load('Reload.png')
     reload_icon = pygame.transform.scale(reload_icon,(64,64))
 
+    button_color = pygame.Color([20,20,20])
+
     running = True
     muted = False
 
-    Clock = pygame.time.Clock()
+    previous_vol = 0
+
+    
+
+    
 
     while running:
         SCREEN.blit(image,(0,0))
@@ -121,7 +171,7 @@ def Jukebox() -> None:
                 if mx >= SCREEN_RECT.width//2 and mx <= (SCREEN_RECT.width//2) +64: #Volume Up
                     if my >= 556 and my <= 556+64:
                         vol = pygame.mixer.Channel(0)
-                        if vol.get_volume() >= 0.5:
+                        if vol.get_volume() >= 0.7:
                             pass
                         else:
                             vol.set_volume(vol.get_volume()+0.01)
@@ -148,17 +198,18 @@ def Jukebox() -> None:
                 
                 if mx >= SCREEN_RECT.left and mx <= SCREEN_RECT.left +64 and not muted: #Mute
                     if my >=SCREEN_RECT.bottom-64 and my <= SCREEN_RECT.bottom:
+                        previous_vol = pygame.mixer.Channel(0).get_volume()
                         pygame.mixer.Channel(0).set_volume(0)
                         muted = True
                 
                 if mx >= SCREEN_RECT.left and mx <= SCREEN_RECT.left +64 and muted: #UnMute
                     if my >=SCREEN_RECT.bottom-128 and my <= SCREEN_RECT.bottom-64:
-                        pygame.mixer.Channel(0).set_volume(0.02)
+                        pygame.mixer.Channel(0).set_volume(previous_vol)
                         muted = False
 
                 if mx >= 60 and mx <= 60+64:
                     if my >= 90 and my <= 90+64:
-                        os.system("Launcher.bat")
+                        os.system("Reload.bat")
 
 
             
@@ -191,7 +242,7 @@ def Jukebox() -> None:
                 
                 if e.key == pygame.K_UP: #Volume UP
                     vol = pygame.mixer.Channel(0)
-                    if vol.get_volume() >= 0.5:
+                    if vol.get_volume() >= 0.7:
                         pass
                     else:
                         vol.set_volume(vol.get_volume()+0.01)
@@ -207,11 +258,12 @@ def Jukebox() -> None:
                     os.startfile(folder_path)
                 
                 if e.key == pygame.K_m and not muted:
+                    previous_vol = pygame.mixer.Channel(0).get_volume()
                     pygame.mixer.Channel(0).set_volume(0)
                     muted = True
                 
                 if e.key == pygame.K_COMMA and muted:
-                    pygame.mixer.Channel(0).set_volume(0.15)
+                    pygame.mixer.Channel(0).set_volume(previous_vol)
                     muted = False
                 
                 if e.key == pygame.K_r:
@@ -226,44 +278,45 @@ def Jukebox() -> None:
             pygame.mixer.Channel(0).play(pygame.mixer.Sound(song_path_list[pos]))
             
         
-        pygame.draw.rect(SCREEN, ('#383838'), (720,606,64,64)) # Skip Button
+        pygame.draw.rect(SCREEN, (button_color), (720,606,64,64)) # Skip Button
         SCREEN.blit(skip_text,(720,608))
 
-        pygame.draw.rect(SCREEN, ('#383838'), (560,606,64,64)) # Back Button
+        pygame.draw.rect(SCREEN, (button_color), (560,606,64,64)) # Back Button
         SCREEN.blit(back_text,(560,608))
 
         current_song_text = Textfont.render((song_path_list[pos].removeprefix("Songs\\"))+f" @{pygame.mixer.Channel(0).get_volume()} Volume",True,('#ffffff')) #Render the current song that is being played
         SCREEN.blit(current_song_text,(0,0))
 
-        pygame.draw.rect(SCREEN,('#383838'),(SCREEN_RECT.width//2,556,64,64)) #Volup
+        pygame.draw.rect(SCREEN,(button_color),(SCREEN_RECT.width//2,556,64,64)) #Volup
         SCREEN.blit(volup_text,(SCREEN_RECT.width//2 +15,556))
 
-        pygame.draw.rect(SCREEN,('#383838'),(SCREEN_RECT.width//2,640,64,64))#Voldown
+        pygame.draw.rect(SCREEN,(button_color),(SCREEN_RECT.width//2,640,64,64))#Voldown
         SCREEN.blit(voldown_text,(SCREEN_RECT.width//2 +15,640+12))
 
-        pygame.draw.rect(SCREEN,('#383838'),(SCREEN_RECT.width-128-10,SCREEN_RECT.height-64,64,64))#Pause
+        pygame.draw.rect(SCREEN,(button_color),(SCREEN_RECT.width-128-10,SCREEN_RECT.height-64,64,64))#Pause
         SCREEN.blit(pause_icon,(SCREEN_RECT.width-128-10,SCREEN_RECT.height-64))
 
-        pygame.draw.rect(SCREEN,('#383838'),(SCREEN_RECT.width-64,SCREEN_RECT.height-64,64,64))#Play
+        pygame.draw.rect(SCREEN,(button_color),(SCREEN_RECT.width-64,SCREEN_RECT.height-64,64,64))#Play
         SCREEN.blit(play_icon,(SCREEN_RECT.width-64,SCREEN_RECT.height-64))
 
-        pygame.draw.rect(SCREEN,('#383838'),(1156,90,64,64)) #Folder
+        pygame.draw.rect(SCREEN,(button_color),(1156,90,64,64)) #Folder
         SCREEN.blit(open_icon,(1156,90))
 
-        pygame.draw.rect(SCREEN,('#383838'),(SCREEN_RECT.left,SCREEN_RECT.bottom-64,64,64)) # Mute
+        pygame.draw.rect(SCREEN,(button_color),(SCREEN_RECT.left,SCREEN_RECT.bottom-64,64,64)) # Mute
         SCREEN.blit(mute_icon,(SCREEN_RECT.left,SCREEN_RECT.bottom-64))
 
-        pygame.draw.rect(SCREEN,('#383838'),(SCREEN_RECT.left,SCREEN_RECT.bottom-128,64,64)) # Unmute
+        pygame.draw.rect(SCREEN,(button_color),(SCREEN_RECT.left,SCREEN_RECT.bottom-128,64,64)) # Unmute
         SCREEN.blit(unmute_icon,(SCREEN_RECT.left,SCREEN_RECT.bottom-128))
 
-        pygame.draw.rect(SCREEN,('#383838'),(60,90,64,64)) # Reload
+        pygame.draw.rect(SCREEN,(button_color),(60,90,64,64)) # Reload
         SCREEN.blit(reload_icon,(60,90))
 
         pygame.display.flip()
         Clock.tick(10)
 
+
 if __name__ == '__main__':
     Jukebox()
 
 else:
-    os.system("Launcher.bat")
+    os.system("Reload.bat")
