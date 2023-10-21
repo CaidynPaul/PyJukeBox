@@ -1,4 +1,4 @@
-taskkill /F /IM python.exe
+taskkill /F /IM Jukebox.exe
 
 
 start Jukebox.exe
