@@ -1,11 +1,24 @@
+__author__ = "Caidyn Paul"
+__copyright__ = "Copyright (C) 2023 Caidyn Paul"
+__license__ = "MIT Licence"
+__version__ = "1.0.8"
+
 # import resource
 import pygame, pygame.mixer
 import os #Import to load all songs in Songs folder
 import sys
-
+import json
+from tkinter import *
+from tkinter import colorchooser
 
 pygame.init()
 pygame.mixer.init()
+
+f = open("config.json",'r')
+data = json.load(f)
+f.close()
+
+button_color = pygame.Color(data.get('button_color'))
 
 def error5():
     pygame.display.set_caption("JukeBox!")
@@ -37,13 +50,12 @@ def error5():
                         os.startfile('Songs')
                 
 
-        pygame.draw.rect(SCREEN,(40,40,40),(118,200,64,64)) #Folder
+        pygame.draw.rect(SCREEN,button_color,(118,200,64,64)) #Folder
         SCREEN.blit(open_icon,(118,200))
         SCREEN.blit(errorMessage,(SCREEN_RECT.left+30,SCREEN_RECT.centery))
         pygame.display.flip()
 
 def Jukebox() -> None:
-    global button_color
     pygame.display.set_caption("JukeBox!")
     AppIcon = pygame.image.load("AppIcon.ico")
     pygame.display.set_icon(AppIcon)
@@ -109,7 +121,6 @@ def Jukebox() -> None:
     pause_icon = pygame.image.load('Pause.png')
     pause_icon = pygame.transform.scale(pause_icon,(64,64))
 
-
     play_icon = pygame.image.load('Play.png')
     play_icon = pygame.transform.scale(play_icon,(64,64))
 
@@ -123,19 +134,14 @@ def Jukebox() -> None:
     unmute_icon = pygame.transform.scale(unmute_icon,(64,64))
 
     reload_icon = pygame.image.load('Reload.png')
-    reload_icon = pygame.transform.scale(reload_icon,(64,64))
+    reload_icon = pygame.transform.scale(reload_icon,(64,64))    
 
-    button_color = pygame.Color([20,20,20])
 
     running = True
     muted = False
 
     previous_vol = 0
-
     
-
-    
-
     while running:
         SCREEN.blit(image,(0,0))
         # SCREEN.fill(('#00000000'))
@@ -210,8 +216,7 @@ def Jukebox() -> None:
                 if mx >= 60 and mx <= 60+64:
                     if my >= 90 and my <= 90+64:
                         os.system("Reload.bat")
-
-
+                    
             
             if e.type == pygame.KEYDOWN:  #Keyboard Controls
                 if e.key == pygame.K_n or e.key == pygame.K_RIGHT:# Next Button KB
@@ -234,8 +239,7 @@ def Jukebox() -> None:
                         pygame.mixer.Channel(0).play(pygame.mixer.Sound(song_path_list[pos]))
 
                 if e.key == pygame.K_c: #Pause button
-                    pygame.mixer.pause()
-                    
+                    pygame.mixer.pause()                    
                 
                 if e.key == pygame.K_v:# Play Button
                     pygame.mixer.unpause()
@@ -267,10 +271,8 @@ def Jukebox() -> None:
                     muted = False
                 
                 if e.key == pygame.K_r:
-                    os.system("Launcher.bat")
-                    
+                    os.system("Launcher.bat")                  
 
-        
         if pygame.mixer.get_busy() == False: # Play next song automatically
             pos += 1
             if pos >= len(song_path_list):
@@ -314,9 +316,133 @@ def Jukebox() -> None:
         pygame.display.flip()
         Clock.tick(10)
 
+def configScreen():
+    root = Tk()
+    root.geometry("300x400+150+100")
+
+
+    def choose_color():
+ 
+        # variable to store hexadecimal code of color
+        color_code = colorchooser.askcolor(title ="Choose color")
+        
+        data["button_color"] = color_code[0]
+        new_json = json.dumps(data)
+        f = open("config.json", "w")
+        f.write(new_json)
+        f.close()
+    
+
+    ColorFrame = Frame(root,width = 300, height =50)
+    ColorButton = Button(root, text = "Choose color",command = choose_color)
+    
+    
+    ColorFrame.pack()
+    ColorButton.pack()
+    root.mainloop()
+
+def titleChoice():
+    pygame.init()
+    pygame.display.set_caption("JukeBox!")
+    AppIcon = pygame.image.load("AppIcon.ico")
+    pygame.display.set_icon(AppIcon)
+
+    SCREEN_WIDTH, SCREEN_HEIGHT = 1280, 720
+    SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    SCREEN_RECT = SCREEN.get_rect()
+
+    font = pygame.font.Font("Ubuntu.ttf", 100)
+
+    # Button 1
+    button1_text = font.render("Play", True, ('#010101'))
+    button1_rect = button1_text.get_rect(center=(SCREEN_RECT.centerx, SCREEN_RECT.centery - 100))
+    button1_hover = False
+
+    # Button 2
+    button2_text = font.render("Config", True, ('#010101'))
+    button2_rect = button2_text.get_rect(center=(SCREEN_RECT.centerx, SCREEN_RECT.centery + 100))
+    button2_hover = False
+
+    clock = pygame.time.Clock()
+    running = True
+
+    while running:
+        SCREEN.fill((10, 10, 10))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mx,my = pygame.mouse.get_pos()
+                if button1_rect.collidepoint(mx,my):
+                    Jukebox()
+                    running = False
+                    quit()
+                
+                if button2_rect.collidepoint(mx,my):
+                    configScreen()
+
+        # Check for button hover
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        button1_hover = button1_rect.collidepoint(mouse_x, mouse_y)
+        button2_hover = button2_rect.collidepoint(mouse_x, mouse_y)
+
+        # Draw buttons with hover effect
+        pygame.draw.rect(SCREEN, ('#2e2e2e') if button1_hover else ('#3a3a3a'), button1_rect)
+        pygame.draw.rect(SCREEN, ('#2e2e2e') if button2_hover else ('#3a3a3a'), button2_rect)
+
+        SCREEN.blit(button1_text, button1_rect)
+        SCREEN.blit(button2_text, button2_rect)
+
+        pygame.display.flip()
+        clock.tick(60)
+
+def titleScreen() -> None:
+    pygame.display.set_caption("JukeBox!")
+    AppIcon = pygame.image.load("AppIcon.ico")
+    pygame.display.set_icon(AppIcon)
+
+    SCREEN_WIDTH, SCREEN_HEIGHT = 1280, 720
+    SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    SCREEN_RECT = SCREEN.get_rect()
+
+    font = pygame.font.Font("Ubuntu.ttf", 200)
+    text = font.render("Jukebox", True, (10, 10, 10))
+    text_rect = text.get_rect(center=SCREEN_RECT.center)
+
+    clock = pygame.time.Clock()
+    running = True
+
+    reveal_color = (button_color.r, button_color.g, button_color.b)  # Color for the reveal effect
+    reveal_width = 0  # Initial width of the reveal effect
+
+    while running:
+        SCREEN.fill((10, 10, 10))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        # Add color-revealing animation effect
+        pygame.draw.rect(SCREEN, reveal_color, (0, 0, reveal_width, SCREEN_HEIGHT))
+        reveal_width += 10  # Adjust the speed of the reveal effect
+
+        # Draw the text on top
+        SCREEN.blit(text, text_rect)
+
+        pygame.display.flip()
+        clock.tick(60)
+
+        if reveal_width >= SCREEN_WIDTH:
+            break  # Exit the loop once the screen is fully revealed
+    
+    titleChoice()
+    pygame.quit()
+    sys.exit()
 
 if __name__ == '__main__':
-    Jukebox()
-
+    titleScreen()
+    
 else:
     os.system("Reload.bat")
