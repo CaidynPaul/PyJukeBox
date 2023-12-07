@@ -407,7 +407,7 @@ def titleChoice():
                 if button1_rect.collidepoint(mx,my):
                     Jukebox()
                     running = False
-                    sys.quit()
+                    sys.exit()
                 
                 if button2_rect.collidepoint(mx,my):
                     configScreen()
