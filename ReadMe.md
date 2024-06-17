@@ -4,12 +4,14 @@ CONTROLS
 * B - Previous Song (Back)
 * V - Unpause
 * C - Pause
-* UP - Volume UP
-* DOWN - Volume Down
 * O - Open Songs Directory
 * M - Mute
 * ,(COMMA) - Unmute
 * R - Reload Jukebox
+* UP - Volume UP
+* DOWN - Volume Down
+* LEFT - Previous Song (Back)
+* RIGHT - Next Song
 
 -----------------------------------------------------------------------------------------------------------------------
 Instructions --
@@ -28,3 +30,4 @@ Avoid Really long file names.
 Info
 
 Songs are played alphabetically (Aa -> Zz)
+Sorted with Bubble sort
