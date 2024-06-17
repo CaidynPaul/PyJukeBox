@@ -13,7 +13,7 @@ CONTROLS
 * LEFT - Previous Song (Back)
 * RIGHT - Next Song
 
------------------------------------------------------------------------------------------------------------------------
+---
 Instructions --
 
 Play with Console
@@ -25,9 +25,15 @@ Do not Edit Code unless you know what you are doing.
 If you edit code and made a mistake redownload project from Github.
 Avoid Really long file names.  
 
------------------------------------------------------------------------------------------------------------------------
+---
 
 Info
 
 Songs are played alphabetically (Aa -> Zz)
 Sorted with Bubble sort
+
+---
+
+Upcoming Features:
+* Sound Visualizer - Update v1.0.8
+
