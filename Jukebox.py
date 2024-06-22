@@ -338,7 +338,7 @@ def Jukebox() -> None:
 
 
 if __name__ == '__main__':
-    error5()
+    Jukebox()
     
 else:
     os.system("Reload.bat")
